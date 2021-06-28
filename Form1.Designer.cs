@@ -39,6 +39,8 @@ namespace SiemensToIgnitionTagConverter
             this.textBoxIgnitionOPCConnectionName = new System.Windows.Forms.TextBox();
             this.openFileDialogTIATagList = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialogSaveIgnitionTagList = new System.Windows.Forms.SaveFileDialog();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // labelTIATagList
@@ -122,11 +124,31 @@ namespace SiemensToIgnitionTagConverter
             this.saveFileDialogSaveIgnitionTagList.Filter = "JSON File | *.json";
             this.saveFileDialogSaveIgnitionTagList.Title = "Save Ignition Tag List";
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(279, 160);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(493, 17);
+            this.label1.TabIndex = 8;
+            this.label1.Text = "Please report any tag conversions that did not work correctly to osm@usn.no";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(279, 180);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(521, 17);
+            this.label2.TabIndex = 9;
+            this.label2.Text = "include the Siemens tag list, and explain what went wrong and what you expected.";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(800, 206);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.textBoxIgnitionOPCConnectionName);
             this.Controls.Add(this.textBoxIgnitionFolderName);
             this.Controls.Add(this.buttonSaveIgnitionTagList);
@@ -136,7 +158,8 @@ namespace SiemensToIgnitionTagConverter
             this.Controls.Add(this.textBoxTIATagList);
             this.Controls.Add(this.labelTIATagList);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Siemens to Ignition Tags";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -154,6 +177,8 @@ namespace SiemensToIgnitionTagConverter
         private System.Windows.Forms.TextBox textBoxIgnitionOPCConnectionName;
         private System.Windows.Forms.OpenFileDialog openFileDialogTIATagList;
         private System.Windows.Forms.SaveFileDialog saveFileDialogSaveIgnitionTagList;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
     }
 }
 

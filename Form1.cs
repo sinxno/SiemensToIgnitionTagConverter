@@ -43,6 +43,7 @@ namespace SiemensToIgnitionTagConverter
             else if (saveFileDialogSaveIgnitionTagList.ShowDialog() == DialogResult.OK)
             {
                 BuildJSONFile(saveFileDialogSaveIgnitionTagList.FileName);
+                MessageBox.Show("JSON-file saved");
             }
         }
 
