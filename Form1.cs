@@ -42,162 +42,179 @@ namespace SiemensToIgnitionTagConverter
             }
             else if (saveFileDialogSaveIgnitionTagList.ShowDialog() == DialogResult.OK)
             {
-                BuildJSONFile(saveFileDialogSaveIgnitionTagList.FileName);
-                MessageBox.Show("JSON-file saved");
+                int noOfTags = BuildJSONFile(saveFileDialogSaveIgnitionTagList.FileName);
+                MessageBox.Show("JSON-file saved.\n" +
+                    "Exported " + noOfTags + " Tags");
             }
         }
 
-        private void BuildJSONFile(string savePath)
+        private int BuildJSONFile(string savePath)
         {
             string[] lines = System.IO.File.ReadAllLines(textBoxTIATagList.Text);
             string last = lines.Last();
             string first = lines.First();
+            int numberOfTags = 0;
 
-            using (StreamWriter writer = new StreamWriter(savePath))
+            if (lines[0].Contains(';'))
             {
-                writer.WriteLine("{");
-                writer.WriteLine("  \"name\": \"" + textBoxIgnitionFolderName.Text + "\",");
-                writer.WriteLine("  \"tagType\": \"Folder\",");
-                writer.WriteLine("  \"tags\": [");
-                //TODO: Get all tags from csv and convert them to JSON format
-
-
-                foreach(string line in lines)
+                using (StreamWriter writer = new StreamWriter(savePath))
                 {
-                    if (line.Equals(first))
+                    writer.WriteLine("{");
+                    writer.WriteLine("  \"name\": \"" + textBoxIgnitionFolderName.Text + "\",");
+                    writer.WriteLine("  \"tagType\": \"Folder\",");
+                    writer.WriteLine("  \"tags\": [");
+                    //TODO: Get all tags from csv and convert them to JSON format
+
+
+                    foreach (string line in lines)
                     {
-                        continue;
-                    }
-                    else
-                    {
-                        string[] columns = line.Split(';');
-                        writer.WriteLine("    {");
-                        writer.WriteLine("      \"valueSource\": \"opc\",");
-                        string adressString = columns[3].Remove(0,1); //Removes the % from the adress
-                        string nameString = columns[0];
-                        string ignitionJSONNameString = String.Empty;
-                        //searching for some illegal characters in the name
-                        while (nameString.Contains('.'))
+                        if (line.Equals(first))
                         {
-                           nameString = nameString.Replace('.', '_');
-                        }
-
-                        while (nameString.Contains('/'))
-                        {
-                            nameString = nameString.Replace('/', '_');
-                        }
-
-                        string numbers = string.Empty;
-                        string letters = string.Empty;
-                        for (int i = 0; i < adressString.Length; i++)
-                        {
-                            if (Char.IsDigit(adressString[i]) || Char.Equals(adressString[i], '.'))
-                            {
-                                numbers += adressString[i];
-                            }
-                            else
-                            {
-                                letters += adressString[i];
-                            }
-                        }
-                        if (letters.Length>1)
-                        {
-                            letters = letters.Remove(1); //Only keep the first letter defining if it is an Input, Output, Memory etc..
-                        }
-                        
-
-                        if (adressString.Contains('.'))
-                        {
-                            //bit access is being used. Ignition needs an X in the adressing.
-                            
-                            
-                            letters += 'X';
-
-                        }
-
-                        
-
-                        switch (columns[2])
-                        {
-                            case "Word":
-                                letters += 'W';
-                                ignitionJSONNameString="      \"dataType\": \"" + "Int4" + "\",";//TODO correlate TIA datatype with Ignition Datatype
-                                break;
-
-                            case "Real":
-                                letters += "REAL";
-                                ignitionJSONNameString = "      \"dataType\": \"" + "Float4" + "\",";//TODO correlate TIA datatype with Ignition Datatype
-                                break;
-
-                            case "Int":
-                                letters += 'I';
-                                ignitionJSONNameString = "      \"dataType\": \"" + "Int4" + "\",";//TODO correlate TIA datatype with Ignition Datatype
-                                break;
-
-                            case "Bool":
-                                ignitionJSONNameString = "      \"dataType\": \"" + "Boolean" + "\",";//TODO correlate TIA datatype with Ignition Datatype
-                                break;
-
-                            case "Time":
-                                ignitionJSONNameString = "      \"dataType\": \"" + "DateTime" + "\",";//TODO correlate TIA datatype with Ignition Datatype
-                                break;
-
-                            case "Byte":
-                                letters += 'B';
-                                ignitionJSONNameString = "      \"dataType\": \"" + "Int1" + "\",";//TODO correlate TIA datatype with Ignition Datatype
-                                break;
-
-                            case "Char":
-                                letters += 'C';
-                                ignitionJSONNameString = "      \"dataType\": \"" + "String" + "\",";//TODO correlate TIA datatype with Ignition Datatype
-                                break;
-
-                            case "DWord":
-                                letters += 'D';
-                                ignitionJSONNameString = "      \"dataType\": \"" + "Int8" + "\",";//TODO correlate TIA datatype with Ignition Datatype
-                                break;
-
-                            case "DInt":
-                                letters += "DI";
-                                ignitionJSONNameString = "      \"dataType\": \"" + "Int8" + "\",";//TODO correlate TIA datatype with Ignition Datatype
-                                break;
-
-                            case "String":
-                                letters += "STRING";
-                                ignitionJSONNameString = "      \"dataType\": \"" + "String" + "\",";//TODO correlate TIA datatype with Ignition Datatype
-                                break;
-
-
-                            default:
-                                ignitionJSONNameString = "      \"dataType\": \"" + "Boolean" + "\",";//TODO correlate TIA datatype with Ignition Datatype
-                                break;
-                        }
-
-                        adressString = letters + numbers;
-
-                        writer.WriteLine("      \"opcItemPath\": \"[" + textBoxIgnitionOPCConnectionName.Text + "]" + adressString + "\",");
-                        writer.WriteLine(ignitionJSONNameString);
-
-
-                        writer.WriteLine("      \"name\": \"" + nameString + "\",");
-                        writer.WriteLine("      \"tagType\": \"AtomicTag\",");
-                        writer.WriteLine("      \"opcServer\": \"Ignition OPC UA Server\"");
-                        if (line.Equals(last))
-                        {
-                            writer.WriteLine("    }");
+                            continue;
                         }
                         else
                         {
-                            writer.WriteLine("    },");
+                            string[] columns = line.Split(';');
+                            writer.WriteLine("    {");
+                            writer.WriteLine("      \"valueSource\": \"opc\",");
+                            string adressString = columns[3].Remove(0, 1); //Removes the % from the adress
+                            string nameString = columns[0];
+                            string ignitionJSONNameString = String.Empty;
+                            //searching for some illegal characters in the name
+                            while (nameString.Contains('.'))
+                            {
+                                nameString = nameString.Replace('.', '_');
+                            }
+
+                            while (nameString.Contains('/'))
+                            {
+                                nameString = nameString.Replace('/', '_');
+                            }
+
+                            string numbers = string.Empty;
+                            string letters = string.Empty;
+                            for (int i = 0; i < adressString.Length; i++)
+                            {
+                                if (Char.IsDigit(adressString[i]) || Char.Equals(adressString[i], '.'))
+                                {
+                                    numbers += adressString[i];
+                                }
+                                else
+                                {
+                                    letters += adressString[i];
+                                }
+                            }
+                            if (letters.Length > 1)
+                            {
+                                letters = letters.Remove(1); //Only keep the first letter defining if it is an Input, Output, Memory etc..
+                            }
+
+
+                            if (adressString.Contains('.'))
+                            {
+                                //bit access is being used. Ignition needs an X in the adressing.
+
+
+                                letters += 'X';
+
+                            }
+
+
+
+                            switch (columns[2])
+                            {
+                                case "Word":
+                                    letters += 'W';
+                                    ignitionJSONNameString = "      \"dataType\": \"" + "Int4" + "\",";//TODO correlate TIA datatype with Ignition Datatype
+                                    break;
+
+                                case "Real":
+                                    letters += "REAL";
+                                    ignitionJSONNameString = "      \"dataType\": \"" + "Float4" + "\",";//TODO correlate TIA datatype with Ignition Datatype
+                                    break;
+
+                                case "Int":
+                                    letters += 'I';
+                                    ignitionJSONNameString = "      \"dataType\": \"" + "Int4" + "\",";//TODO correlate TIA datatype with Ignition Datatype
+                                    break;
+
+                                case "Bool":
+                                    ignitionJSONNameString = "      \"dataType\": \"" + "Boolean" + "\",";//TODO correlate TIA datatype with Ignition Datatype
+                                    break;
+
+                                case "Time":
+                                    ignitionJSONNameString = "      \"dataType\": \"" + "DateTime" + "\",";//TODO correlate TIA datatype with Ignition Datatype
+                                    break;
+
+                                case "Byte":
+                                    letters += 'B';
+                                    ignitionJSONNameString = "      \"dataType\": \"" + "Int1" + "\",";//TODO correlate TIA datatype with Ignition Datatype
+                                    break;
+
+                                case "Char":
+                                    letters += 'C';
+                                    ignitionJSONNameString = "      \"dataType\": \"" + "String" + "\",";//TODO correlate TIA datatype with Ignition Datatype
+                                    break;
+
+                                case "DWord":
+                                    letters += 'D';
+                                    ignitionJSONNameString = "      \"dataType\": \"" + "Int8" + "\",";//TODO correlate TIA datatype with Ignition Datatype
+                                    break;
+
+                                case "DInt":
+                                    letters += "DI";
+                                    ignitionJSONNameString = "      \"dataType\": \"" + "Int8" + "\",";//TODO correlate TIA datatype with Ignition Datatype
+                                    break;
+
+                                case "String":
+                                    letters += "STRING";
+                                    ignitionJSONNameString = "      \"dataType\": \"" + "String" + "\",";//TODO correlate TIA datatype with Ignition Datatype
+                                    break;
+
+
+                                default:
+                                    ignitionJSONNameString = "      \"dataType\": \"" + "Boolean" + "\",";//TODO correlate TIA datatype with Ignition Datatype
+                                    break;
+                            }
+
+                            adressString = letters + numbers;
+
+                            writer.WriteLine("      \"opcItemPath\": \"[" + textBoxIgnitionOPCConnectionName.Text + "]" + adressString + "\",");
+                            writer.WriteLine(ignitionJSONNameString);
+
+
+                            writer.WriteLine("      \"name\": \"" + nameString + "\",");
+                            writer.WriteLine("      \"tagType\": \"AtomicTag\",");
+                            writer.WriteLine("      \"opcServer\": \"Ignition OPC UA Server\"");
+                            if (line.Equals(last))
+                            {
+                                writer.WriteLine("    }");
+                            }
+                            else
+                            {
+                                writer.WriteLine("    },");
+                            }
+
+                            numberOfTags++;
+
                         }
                     }
+
+
+
+                    writer.WriteLine("  ]");
+                    writer.WriteLine("}");
                 }
-
-
-
-                writer.WriteLine("  ]");
-                writer.WriteLine("}");
             }
+            else
+            {
+                MessageBox.Show("CSV file is not formatted correctly!\n" +
+                    "Make sure it uses ';' as delimiter.");
+            }
+
+            
+
+            return numberOfTags;
         }
     }
 }
