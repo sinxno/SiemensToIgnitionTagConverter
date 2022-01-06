@@ -50,11 +50,12 @@ namespace SiemensToIgnitionTagConverter
 
         private int BuildJSONFile(string savePath)
         {
+            //TODO: IMPLEMENT SUPPORT FOR XLS files
             string[] lines = System.IO.File.ReadAllLines(textBoxTIATagList.Text);
             string last = lines.Last();
             string first = lines.First();
             int numberOfTags = 0;
-
+            //TODO: IMPLEMENT SUPPORT FOR COMMA DELIMITED CSVs
             if (lines[0].Contains(';'))
             {
                 using (StreamWriter writer = new StreamWriter(savePath))
@@ -64,6 +65,9 @@ namespace SiemensToIgnitionTagConverter
                     writer.WriteLine("  \"tagType\": \"Folder\",");
                     writer.WriteLine("  \"tags\": [");
                     //TODO: Get all tags from csv and convert them to JSON format
+                    //TODO: IMPLEMENT SUPPORT FOR DB TAGS
+                    
+                    //TODO: IMPLEMENT SUPPORT FOR DUTs
 
 
                     foreach (string line in lines)
