@@ -58,6 +58,12 @@ namespace SiemensToIgnitionTagConverter
             }
         }
 
+        private void checkBoxDB_CheckedChanged(object sender, EventArgs e)
+        {
+            labelDBNumber.Visible = checkBoxDB.Checked;
+            textBoxDBNumber.Visible = checkBoxDB.Checked;
+        }
+
         private int BuildJSONFile(string savePath)
         {
             //TODO: IMPLEMENT SUPPORT FOR XLS files
@@ -71,10 +77,6 @@ namespace SiemensToIgnitionTagConverter
                 using (StreamWriter writer = new StreamWriter(savePath))
                 {
                     JSONFileStartSegment(writer);
-                    //TODO: Get all tags from csv and convert them to JSON format
-                    //TODO: IMPLEMENT SUPPORT FOR DB TAGS
-
-                    //TODO: IMPLEMENT SUPPORT FOR DUTs
 
 
                     foreach (string line in lines)
@@ -86,11 +88,12 @@ namespace SiemensToIgnitionTagConverter
                         else
                         {
                             string[] columns = line.Split(';');
-                            writer.WriteLine("    {");
-                            writer.WriteLine("      \"valueSource\": \"opc\",");
+                            JSONFileStartLineSegment(writer);
                             string adressString = columns[3].Remove(0, 1); //Removes the % from the adress
                             string nameString = columns[0];
                             string ignitionJSONNameString = String.Empty;
+                            string numbers = string.Empty;
+                            string letters = string.Empty;
                             //searching for some illegal characters in the name
                             while (nameString.Contains('.'))
                             {
@@ -102,8 +105,7 @@ namespace SiemensToIgnitionTagConverter
                                 nameString = nameString.Replace('/', '_');
                             }
 
-                            string numbers = string.Empty;
-                            string letters = string.Empty;
+                            
                             for (int i = 0; i < adressString.Length; i++)
                             {
                                 if (Char.IsDigit(adressString[i]) || Char.Equals(adressString[i], '.'))
@@ -138,19 +140,7 @@ namespace SiemensToIgnitionTagConverter
 
                             adressString = letters + numbers;
 
-                            writer.WriteLine("      \"opcItemPath\": \"[" + textBoxIgnitionOPCConnectionName.Text + "]" + adressString + "\",");
-                            writer.WriteLine(ignitionJSONNameString);
-                            writer.WriteLine("      \"name\": \"" + nameString + "\",");
-                            writer.WriteLine("      \"tagType\": \"AtomicTag\",");
-                            writer.WriteLine("      \"opcServer\": \"Ignition OPC UA Server\"");
-                            if (line.Equals(last))
-                            {
-                                writer.WriteLine("    }");
-                            }
-                            else
-                            {
-                                writer.WriteLine("    },");
-                            }
+                            JSONFileEndLineSegment(writer, adressString, ignitionJSONNameString, nameString, line, last);
 
                             numberOfTags++;
 
@@ -159,8 +149,7 @@ namespace SiemensToIgnitionTagConverter
 
 
 
-                    writer.WriteLine("  ]");
-                    writer.WriteLine("}");
+                    JSONFileEndSegment(writer);
                 }
             }
             else
@@ -176,11 +165,7 @@ namespace SiemensToIgnitionTagConverter
 
         
 
-        private void checkBoxDB_CheckedChanged(object sender, EventArgs e)
-        {
-            labelDBNumber.Visible = checkBoxDB.Checked;
-            textBoxDBNumber.Visible = checkBoxDB.Checked;
-        }
+
 
         private int BuildJSONFileDB(string savePath)
         {
@@ -210,8 +195,7 @@ namespace SiemensToIgnitionTagConverter
                         else
                         {
                             string[] columns = line.Split(';');
-                            writer.WriteLine("    {");
-                            writer.WriteLine("      \"valueSource\": \"opc\",");
+                            JSONFileStartLineSegment(writer);
                             string adressString = columns[2];
                             string nameString = columns[0];
                             string ignitionJSONNameString = String.Empty;
@@ -249,29 +233,14 @@ namespace SiemensToIgnitionTagConverter
                             
                             adressString = letters + columns[2];
 
-                            writer.WriteLine("      \"opcItemPath\": \"[" + textBoxIgnitionOPCConnectionName.Text + "]" + adressString + "\",");
-                            writer.WriteLine(ignitionJSONNameString);
-
-
-                            writer.WriteLine("      \"name\": \"" + nameString + "\",");
-                            writer.WriteLine("      \"tagType\": \"AtomicTag\",");
-                            writer.WriteLine("      \"opcServer\": \"Ignition OPC UA Server\"");
-                            if (line.Equals(last))
-                            {
-                                writer.WriteLine("    }");
-                            }
-                            else
-                            {
-                                writer.WriteLine("    },");
-                            }
+                            JSONFileEndLineSegment(writer, adressString, ignitionJSONNameString, nameString, line, last);
 
                             numberOfTags++;
 
                         }
                     }
 
-                    writer.WriteLine("  ]");
-                    writer.WriteLine("}");
+                    JSONFileEndSegment(writer);
                 }
             }
             else
@@ -290,11 +259,43 @@ namespace SiemensToIgnitionTagConverter
             writer.WriteLine("  \"tagType\": \"Folder\",");
             writer.WriteLine("  \"tags\": [");
         }
+        
+        private void JSONFileStartLineSegment(StreamWriter writer)
+        {
+            writer.WriteLine("    {");
+            writer.WriteLine("      \"valueSource\": \"opc\",");
+        }
+
+        private void JSONFileEndLineSegment(StreamWriter writer, string adressString, string ignitionJSONNameString, string nameString, string line, string last)
+        {
+            textBoxIgnitionOPCConnectionName.Text = textBoxIgnitionOPCConnectionName.Text.Replace("[", String.Empty).Replace("]", String.Empty);
+            writer.WriteLine("      \"opcItemPath\": \"[" + textBoxIgnitionOPCConnectionName.Text + "]" + adressString + "\",");
+            writer.WriteLine(ignitionJSONNameString);
+
+
+            writer.WriteLine("      \"name\": \"" + nameString + "\",");
+            writer.WriteLine("      \"tagType\": \"AtomicTag\",");
+            writer.WriteLine("      \"opcServer\": \"Ignition OPC UA Server\"");
+            if (line.Equals(last))
+            {
+                writer.WriteLine("    }");
+            }
+            else
+            {
+                writer.WriteLine("    },");
+            }
+        }
+
+        private void JSONFileEndSegment(StreamWriter writer)
+        {
+            writer.WriteLine("  ]");
+            writer.WriteLine("}");
+        }
 
         private (string letter, string ignitionJSONNameString) DataTypeSelector(string column)
         {
             string dataLetter = String.Empty;
-            string JSONNameString = String.Empty;
+            string JSONNameString;
 
             switch (column)
             {
@@ -356,6 +357,10 @@ namespace SiemensToIgnitionTagConverter
 
             return (dataLetter, JSONNameString);
         }
+
+        
+
+        
 
 
     }
