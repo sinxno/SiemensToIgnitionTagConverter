@@ -318,7 +318,8 @@ namespace SiemensToIgnitionTagConverter
                     break;
 
                 case "Time":
-                    JSONNameString = "      \"dataType\": \"" + "DateTime" + "\",";//TODO correlate TIA datatype with Ignition Datatype
+                    dataLetter += 'I';
+                    JSONNameString = "      \"dataType\": \"" + "Int4" + "\",";//TODO correlate TIA datatype with Ignition Datatype
                     break;
 
                 case "Byte":
