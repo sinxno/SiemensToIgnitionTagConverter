@@ -94,7 +94,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <None Include="PRECOMPILED_BINARY\SiemensToIgnition_PRECOMPILED_BINARY.zip" />
+    <None Include="PRECOMPILED_BINARY\SiemensToIgnition_PRECOMPILED.zip" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

@@ -41,6 +41,9 @@ namespace SiemensToIgnitionTagConverter
             this.saveFileDialogSaveIgnitionTagList = new System.Windows.Forms.SaveFileDialog();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.checkBoxDB = new System.Windows.Forms.CheckBox();
+            this.labelDBNumber = new System.Windows.Forms.Label();
+            this.textBoxDBNumber = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // labelTIATagList
@@ -72,7 +75,7 @@ namespace SiemensToIgnitionTagConverter
             // labelIgnitionFolderName
             // 
             this.labelIgnitionFolderName.AutoSize = true;
-            this.labelIgnitionFolderName.Location = new System.Drawing.Point(13, 62);
+            this.labelIgnitionFolderName.Location = new System.Drawing.Point(13, 83);
             this.labelIgnitionFolderName.Name = "labelIgnitionFolderName";
             this.labelIgnitionFolderName.Size = new System.Drawing.Size(138, 17);
             this.labelIgnitionFolderName.TabIndex = 3;
@@ -92,24 +95,24 @@ namespace SiemensToIgnitionTagConverter
             this.buttonSaveIgnitionTagList.Location = new System.Drawing.Point(13, 160);
             this.buttonSaveIgnitionTagList.Name = "buttonSaveIgnitionTagList";
             this.buttonSaveIgnitionTagList.Size = new System.Drawing.Size(185, 32);
-            this.buttonSaveIgnitionTagList.TabIndex = 5;
+            this.buttonSaveIgnitionTagList.TabIndex = 7;
             this.buttonSaveIgnitionTagList.Text = "Save Ignition Tag List";
             this.buttonSaveIgnitionTagList.UseVisualStyleBackColor = true;
             this.buttonSaveIgnitionTagList.Click += new System.EventHandler(this.buttonSaveIgnitionTagList_Click);
             // 
             // textBoxIgnitionFolderName
             // 
-            this.textBoxIgnitionFolderName.Location = new System.Drawing.Point(224, 59);
+            this.textBoxIgnitionFolderName.Location = new System.Drawing.Point(224, 80);
             this.textBoxIgnitionFolderName.Name = "textBoxIgnitionFolderName";
             this.textBoxIgnitionFolderName.Size = new System.Drawing.Size(411, 22);
-            this.textBoxIgnitionFolderName.TabIndex = 6;
+            this.textBoxIgnitionFolderName.TabIndex = 5;
             // 
             // textBoxIgnitionOPCConnectionName
             // 
             this.textBoxIgnitionOPCConnectionName.Location = new System.Drawing.Point(224, 108);
             this.textBoxIgnitionOPCConnectionName.Name = "textBoxIgnitionOPCConnectionName";
             this.textBoxIgnitionOPCConnectionName.Size = new System.Drawing.Size(411, 22);
-            this.textBoxIgnitionOPCConnectionName.TabIndex = 7;
+            this.textBoxIgnitionOPCConnectionName.TabIndex = 6;
             // 
             // openFileDialogTIATagList
             // 
@@ -142,11 +145,43 @@ namespace SiemensToIgnitionTagConverter
             this.label2.TabIndex = 9;
             this.label2.Text = "include the Siemens tag list, and explain what went wrong and what you expected.";
             // 
+            // checkBoxDB
+            // 
+            this.checkBoxDB.AutoSize = true;
+            this.checkBoxDB.Location = new System.Drawing.Point(16, 41);
+            this.checkBoxDB.Name = "checkBoxDB";
+            this.checkBoxDB.Size = new System.Drawing.Size(94, 21);
+            this.checkBoxDB.TabIndex = 3;
+            this.checkBoxDB.Text = "DB tag list";
+            this.checkBoxDB.UseVisualStyleBackColor = true;
+            this.checkBoxDB.CheckedChanged += new System.EventHandler(this.checkBoxDB_CheckedChanged);
+            // 
+            // labelDBNumber
+            // 
+            this.labelDBNumber.AutoSize = true;
+            this.labelDBNumber.Location = new System.Drawing.Point(136, 42);
+            this.labelDBNumber.Name = "labelDBNumber";
+            this.labelDBNumber.Size = new System.Drawing.Size(79, 17);
+            this.labelDBNumber.TabIndex = 11;
+            this.labelDBNumber.Text = "DB number";
+            this.labelDBNumber.Visible = false;
+            // 
+            // textBoxDBNumber
+            // 
+            this.textBoxDBNumber.Location = new System.Drawing.Point(224, 39);
+            this.textBoxDBNumber.Name = "textBoxDBNumber";
+            this.textBoxDBNumber.Size = new System.Drawing.Size(411, 22);
+            this.textBoxDBNumber.TabIndex = 4;
+            this.textBoxDBNumber.Visible = false;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 206);
+            this.Controls.Add(this.textBoxDBNumber);
+            this.Controls.Add(this.labelDBNumber);
+            this.Controls.Add(this.checkBoxDB);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textBoxIgnitionOPCConnectionName);
@@ -179,6 +214,9 @@ namespace SiemensToIgnitionTagConverter
         private System.Windows.Forms.SaveFileDialog saveFileDialogSaveIgnitionTagList;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.CheckBox checkBoxDB;
+        private System.Windows.Forms.Label labelDBNumber;
+        private System.Windows.Forms.TextBox textBoxDBNumber;
     }
 }
 
