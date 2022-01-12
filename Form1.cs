@@ -42,18 +42,9 @@ namespace SiemensToIgnitionTagConverter
             }
             else if (saveFileDialogSaveIgnitionTagList.ShowDialog() == DialogResult.OK)
             {
-                if (!checkBoxDB.Checked) //if the tag list is standard memory and IO tags
-                {
-                    int noOfTags = BuildJSONFile(saveFileDialogSaveIgnitionTagList.FileName);
-                    MessageBox.Show("JSON-file saved.\n" +
-                        "Exported " + noOfTags + " Tags");
-                }
-                else //the tag list is referencing an DB
-                {
-                    int noOfTags = BuildJSONFileDB(saveFileDialogSaveIgnitionTagList.FileName);
-                    MessageBox.Show("DB JSON-file saved.\n" +
-                        "Exported " + noOfTags + " Tags");
-                }
+                int noOfTags = BuildJSONFile(saveFileDialogSaveIgnitionTagList.FileName);
+                MessageBox.Show("JSON-file saved.\n" + "Exported " + noOfTags + " Tags");
+              
                 
             }
         }
@@ -89,7 +80,10 @@ namespace SiemensToIgnitionTagConverter
                         {
                             string[] columns = line.Split(';');
                             JSONFileStartLineSegment(writer);
-                            string adressString = columns[3].Remove(0, 1); //Removes the % from the adress
+                            string adressString = String.Empty;
+                            if (!checkBoxDB.Checked){adressString = columns[3].Remove(0, 1);} //Removes the % from the adress
+                            else {adressString = columns[2]; }
+
                             string nameString = columns[0];
                             string ignitionJSONNameString = String.Empty;
                             string numbers = string.Empty;
@@ -105,41 +99,64 @@ namespace SiemensToIgnitionTagConverter
                                 nameString = nameString.Replace('/', '_');
                             }
 
-                            
-                            for (int i = 0; i < adressString.Length; i++)
+                            if (!checkBoxDB.Checked)
                             {
-                                if (Char.IsDigit(adressString[i]) || Char.Equals(adressString[i], '.'))
+                                for (int i = 0; i < adressString.Length; i++)
                                 {
-                                    numbers += adressString[i];
+                                    if (Char.IsDigit(adressString[i]) || Char.Equals(adressString[i], '.'))
+                                    {
+                                        numbers += adressString[i];
+                                    }
+                                    else
+                                    {
+                                        letters += adressString[i];
+                                    }
+                                }
+                                if (letters.Length > 1)
+                                {
+                                    letters = letters.Remove(1); //Only keep the first letter defining if it is an Input, Output, Memory etc..
+                                }
+
+
+                                if (adressString.Contains('.'))
+                                {
+                                    //bit access is being used. Ignition needs an X in the adressing.
+
+
+                                    letters += 'X';
+
+                                }
+                                var dataType = DataTypeSelector(columns[2]);
+                                letters += dataType.letter;
+                                ignitionJSONNameString = dataType.ignitionJSONNameString;
+
+                                adressString = letters + numbers;
+                            }
+                            else
+                            {
+                                letters = "DB" + textBoxDBNumber.Text + ",";
+
+
+                                if (columns[1].Contains("Bool"))
+                                {
+                                    //bit access is being used. Ignition needs an X in the adressing.
+
+                                    letters += 'X';
+
                                 }
                                 else
                                 {
-                                    letters += adressString[i];
+                                    //remove .0 from offset
+                                    columns[2] = columns[2].Remove(columns[2].IndexOf('.'));
                                 }
+                                var dataType = DataTypeSelector(columns[1]);
+                                letters += dataType.letter;
+                                ignitionJSONNameString = dataType.ignitionJSONNameString;
+
+
+                                adressString = letters + columns[2];
                             }
-                            if (letters.Length > 1)
-                            {
-                                letters = letters.Remove(1); //Only keep the first letter defining if it is an Input, Output, Memory etc..
-                            }
-
-
-                            if (adressString.Contains('.'))
-                            {
-                                //bit access is being used. Ignition needs an X in the adressing.
-
-
-                                letters += 'X';
-
-                            }
-
-
-
-                            var dataType = DataTypeSelector(columns[2]);
-                            letters += dataType.letter;
-                            ignitionJSONNameString = dataType.ignitionJSONNameString;
-
-                            adressString = letters + numbers;
-
+                                
                             JSONFileEndLineSegment(writer, adressString, ignitionJSONNameString, nameString, line, last);
 
                             numberOfTags++;
@@ -164,93 +181,6 @@ namespace SiemensToIgnitionTagConverter
         }
 
         
-
-
-
-        private int BuildJSONFileDB(string savePath)
-        {
-            string[] lines = System.IO.File.ReadAllLines(textBoxTIATagList.Text);
-            string last = lines.Last();
-            string first = lines.First();
-            int numberOfTags = 0;
-            //TODO: IMPLEMENT SUPPORT FOR COMMA DELIMITED CSVs
-            if (lines[0].Contains(';'))
-            {
-                using (StreamWriter writer = new StreamWriter(savePath))
-                {
-                    JSONFileStartSegment(writer);
-
-                    //TODO: Get all tags from csv and convert them to JSON format
-                    //TODO: IMPLEMENT SUPPORT FOR DB TAGS
-
-                    //TODO: IMPLEMENT SUPPORT FOR DUTs
-
-
-                    foreach (string line in lines)
-                    {
-                        if (line.Equals(first))
-                        {
-                            continue;
-                        }
-                        else
-                        {
-                            string[] columns = line.Split(';');
-                            JSONFileStartLineSegment(writer);
-                            string adressString = columns[2];
-                            string nameString = columns[0];
-                            string ignitionJSONNameString = String.Empty;
-                            //searching for some illegal characters in the name
-                            while (nameString.Contains('.'))
-                            {
-                                nameString = nameString.Replace('.', '_');
-                            }
-
-                            while (nameString.Contains('/'))
-                            {
-                                nameString = nameString.Replace('/', '_');
-                            }
-
-                            string letters = "DB"+textBoxDBNumber.Text+",";
-                            
-
-                            if (columns[1].Contains("Bool"))
-                            {
-                                //bit access is being used. Ignition needs an X in the adressing.
-
-                                letters += 'X';
-                                
-                            }
-                            else
-                            {
-                                //remove .0 from offset
-                                columns[2] = columns[2].Remove(columns[2].IndexOf('.'));
-                            }
-
-                            var dataType = DataTypeSelector(columns[1]);
-                            letters += dataType.letter;
-                            ignitionJSONNameString = dataType.ignitionJSONNameString;
-
-                            
-                            adressString = letters + columns[2];
-
-                            JSONFileEndLineSegment(writer, adressString, ignitionJSONNameString, nameString, line, last);
-
-                            numberOfTags++;
-
-                        }
-                    }
-
-                    JSONFileEndSegment(writer);
-                }
-            }
-            else
-            {
-                MessageBox.Show("CSV file is not formatted correctly!\n" +
-                    "Make sure it uses ';' as delimiter.");
-            }
-
-            return numberOfTags;
-        }
 
         private void JSONFileStartSegment(StreamWriter writer)
         {
